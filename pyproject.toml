@@ -24,6 +24,7 @@ dependencies = [
 
 [project.scripts]
 generate-synthetic-experiment = "causal_uplift_experimentation_ops.data.generation:main"
+generate-ab-report = "causal_uplift_experimentation_ops.experiments.report:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
