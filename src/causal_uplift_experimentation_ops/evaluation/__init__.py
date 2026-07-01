@@ -1,5 +1,13 @@
 """Leakage-safe splitting and uplift evaluation utilities."""
 
+from causal_uplift_experimentation_ops.evaluation.bootstrap import (
+    BootstrapSummary,
+    bootstrap_uplift_metrics,
+    summarize_bootstrap_results,
+)
+from causal_uplift_experimentation_ops.evaluation.bootstrap_report import (
+    generate_bootstrap_report,
+)
 from causal_uplift_experimentation_ops.evaluation.metrics import (
     auuc_score,
     cumulative_uplift_curve,
@@ -27,19 +35,23 @@ from causal_uplift_experimentation_ops.evaluation.splitting import (
 )
 
 __all__ = [
+    "BootstrapSummary",
     "DEFAULT_ROBUSTNESS_SEEDS",
     "ExperimentSplit",
     "RobustnessSummary",
     "add_oracle_uplift_score",
     "auuc_score",
+    "bootstrap_uplift_metrics",
     "cumulative_uplift_curve",
     "evaluate_t_learner_repeated_splits",
     "generate_robustness_report",
+    "generate_bootstrap_report",
     "generate_uplift_evaluation_report",
     "qini_coefficient",
     "qini_curve",
     "split_experiment_data",
     "summarize_repeated_split_results",
+    "summarize_bootstrap_results",
     "top_k_policy_summary",
     "uplift_ranking_table",
 ]

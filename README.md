@@ -127,6 +127,38 @@ python -m pytest
 python -m ruff check .
 ```
 
+## Milestone 6: bootstrap uncertainty
+
+Milestone 6 fits the existing T-learner on one fixed split, then resamples its scored test rows
+within treatment arms. It reports percentile uncertainty for AUUC, Qini-style performance,
+maximum Qini gain, and top-k uplift. These intervals capture held-out evaluation-sample
+uncertainty; repeated-split robustness remains the diagnostic for training and split sensitivity.
+
+Generate the data and all current reports:
+
+```bash
+generate-synthetic-experiment
+generate-ab-report
+generate-uplift-evaluation
+generate-t-learner-report
+generate-t-learner-robustness
+generate-t-learner-bootstrap
+```
+
+The bootstrap report is written to `reports/t_learner_bootstrap_uncertainty.md`. Sample count and
+seeds can be customized:
+
+```bash
+generate-t-learner-bootstrap --n-bootstrap 100 --bootstrap-seed 42 --split-seed 42
+```
+
+Run the full test and lint suite:
+
+```bash
+python -m pytest
+python -m ruff check .
+```
+
 ## Milestone 5: repeated-split robustness
 
 Milestone 5 reruns the same leakage-safe logistic T-learner over multiple deterministic,

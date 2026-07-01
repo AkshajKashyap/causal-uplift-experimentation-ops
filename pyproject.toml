@@ -28,6 +28,7 @@ generate-ab-report = "causal_uplift_experimentation_ops.experiments.report:main"
 generate-uplift-evaluation = "causal_uplift_experimentation_ops.evaluation.report:main"
 generate-t-learner-report = "causal_uplift_experimentation_ops.models.report:main"
 generate-t-learner-robustness = "causal_uplift_experimentation_ops.evaluation.robustness_report:main"
+generate-t-learner-bootstrap = "causal_uplift_experimentation_ops.evaluation.bootstrap_report:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
