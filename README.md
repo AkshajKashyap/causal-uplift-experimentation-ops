@@ -126,3 +126,34 @@ Run the full test and lint suite:
 python -m pytest
 python -m ruff check .
 ```
+
+## Milestone 5: repeated-split robustness
+
+Milestone 5 reruns the same leakage-safe logistic T-learner over multiple deterministic,
+treatment-stratified splits. It reports per-seed AUUC, Qini-style performance, maximum Qini gain,
+and top-k uplift, then summarizes their mean, population standard deviation, minimum, maximum,
+and positive-Qini frequency. No new model family is introduced.
+
+Generate the data and all current reports:
+
+```bash
+generate-synthetic-experiment
+generate-ab-report
+generate-uplift-evaluation
+generate-t-learner-report
+generate-t-learner-robustness
+```
+
+The robustness report is written to `reports/t_learner_repeated_split_robustness.md`. Seeds and
+test fraction can be customized:
+
+```bash
+generate-t-learner-robustness --seeds 0 1 2 3 4 --test-size 0.3
+```
+
+Run the full test and lint suite:
+
+```bash
+python -m pytest
+python -m ruff check .
+```
