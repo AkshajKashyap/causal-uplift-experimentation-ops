@@ -67,3 +67,32 @@ Run all tests and lint checks:
 python -m pytest
 python -m ruff check .
 ```
+
+## Milestone 3: uplift evaluation foundation
+
+Milestone 3 adds a deterministic treatment-stratified train/test split, leakage-safe feature
+metadata, uplift ranking tables, cumulative uplift and Qini-style curves, AUUC-style area, and
+top-k targeting summaries. Synthetic `true_uplift` can be copied into an oracle score solely to
+validate the evaluation protocol; it is explicitly excluded from model features.
+
+Generate the data and both analysis reports:
+
+```bash
+generate-synthetic-experiment
+generate-ab-report
+generate-uplift-evaluation
+```
+
+The oracle evaluation report is written to `reports/synthetic_uplift_evaluation.md`. Its input,
+output, split seed, test fraction, and number of ranking bins can be customized:
+
+```bash
+generate-uplift-evaluation --test-size 0.3 --seed 42 --bins 10
+```
+
+Run the complete test and lint suite:
+
+```bash
+python -m pytest
+python -m ruff check .
+```
