@@ -96,3 +96,33 @@ Run the complete test and lint suite:
 python -m pytest
 python -m ruff check .
 ```
+
+## Milestone 4: logistic T-learner baseline
+
+Milestone 4 adds the first fitted uplift baseline: separate logistic conversion models for treated
+and control users. Numeric features are median-imputed and standardized; categorical features are
+most-frequent-imputed and one-hot encoded with unknown-category handling. Predicted uplift is the
+difference between the two predicted conversion probabilities, evaluated only on held-out rows.
+
+Generate the data and all current reports:
+
+```bash
+generate-synthetic-experiment
+generate-ab-report
+generate-uplift-evaluation
+generate-t-learner-report
+```
+
+The model report is written to `reports/synthetic_t_learner_report.md`. Split and report settings
+can be customized:
+
+```bash
+generate-t-learner-report --test-size 0.3 --seed 42 --bins 10
+```
+
+Run the full test and lint suite:
+
+```bash
+python -m pytest
+python -m ruff check .
+```
