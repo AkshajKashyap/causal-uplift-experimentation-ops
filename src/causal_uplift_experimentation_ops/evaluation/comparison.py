@@ -42,26 +42,12 @@ class ModelComparisonResult:
     feature_columns: tuple[str, ...]
 
 
-def _score_metrics(scored: pd.DataFrame) -> dict[str, float]:
-    qini = qini_curve(scored)
-    policies = top_k_policy_summary(scored).set_index("target_fraction")
-    return {
-        "auuc": auuc_score(scored),
-        "qini_coefficient": qini_coefficient(scored),
-        "maximum_qini_gain": float(qini["qini_gain"].max()),
-        "top_10_percent_uplift": float(policies.loc[0.1, "estimated_uplift"]),
-        "top_20_percent_uplift": float(policies.loc[0.2, "estimated_uplift"]),
-        "top_30_percent_uplift": float(policies.loc[0.3, "estimated_uplift"]),
-    }
-
-
-def compare_uplift_models(
+def score_comparison_models(
     data: pd.DataFrame,
     n_splits: int = 5,
     seed: int = 42,
-    n_bootstrap: int = 100,
-) -> ModelComparisonResult:
-    """Cross-fit registered models and compare them with random and oracle scores."""
+) -> tuple[dict[str, pd.DataFrame], tuple[str, ...]]:
+    """Return cross-fitted model predictions plus random and optional oracle baselines."""
     features = resolve_feature_columns(data)
     scored_predictions: dict[str, pd.DataFrame] = {}
     for model_name in DEFAULT_MODEL_NAMES:
@@ -84,6 +70,34 @@ def compare_uplift_models(
             n_splits=n_splits,
             seed=seed,
         )
+    return scored_predictions, features
+
+
+def _score_metrics(scored: pd.DataFrame) -> dict[str, float]:
+    qini = qini_curve(scored)
+    policies = top_k_policy_summary(scored).set_index("target_fraction")
+    return {
+        "auuc": auuc_score(scored),
+        "qini_coefficient": qini_coefficient(scored),
+        "maximum_qini_gain": float(qini["qini_gain"].max()),
+        "top_10_percent_uplift": float(policies.loc[0.1, "estimated_uplift"]),
+        "top_20_percent_uplift": float(policies.loc[0.2, "estimated_uplift"]),
+        "top_30_percent_uplift": float(policies.loc[0.3, "estimated_uplift"]),
+    }
+
+
+def compare_uplift_models(
+    data: pd.DataFrame,
+    n_splits: int = 5,
+    seed: int = 42,
+    n_bootstrap: int = 100,
+) -> ModelComparisonResult:
+    """Cross-fit registered models and compare them with random and oracle scores."""
+    scored_predictions, features = score_comparison_models(
+        data,
+        n_splits=n_splits,
+        seed=seed,
+    )
 
     metric_records = [
         {"model": model_name, **_score_metrics(scored)}

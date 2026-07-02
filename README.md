@@ -127,12 +127,12 @@ python -m pytest
 python -m ruff check .
 ```
 
-## Milestone 7: cross-fitted model comparison
+## Milestone 5: repeated-split robustness
 
-Milestone 7 adds deterministic, treatment-stratified out-of-fold scoring and a reusable uplift
-model registry. It compares logistic T- and S-learners, a random-forest T-learner, a deterministic
-random-score baseline, and the synthetic oracle. Every row is scored exactly once by a model that
-did not train on that row. Existing AUUC, Qini, top-k, and bootstrap utilities are reused.
+Milestone 5 reruns the same leakage-safe logistic T-learner over multiple deterministic,
+treatment-stratified splits. It reports per-seed AUUC, Qini-style performance, maximum Qini gain,
+and top-k uplift, then summarizes their mean, population standard deviation, minimum, maximum,
+and positive-Qini frequency. No new model family is introduced.
 
 Generate the data and all current reports:
 
@@ -142,15 +142,13 @@ generate-ab-report
 generate-uplift-evaluation
 generate-t-learner-report
 generate-t-learner-robustness
-generate-t-learner-bootstrap
-generate-crossfit-comparison
 ```
 
-The comparison report is written to `reports/crossfit_model_comparison.md`. Fold count, seed, and
-bootstrap count can be customized:
+The robustness report is written to `reports/t_learner_repeated_split_robustness.md`. Seeds and
+test fraction can be customized:
 
 ```bash
-generate-crossfit-comparison --folds 5 --seed 42 --n-bootstrap 100
+generate-t-learner-robustness --seeds 0 1 2 3 4 --test-size 0.3
 ```
 
 Run the full test and lint suite:
@@ -192,12 +190,12 @@ python -m pytest
 python -m ruff check .
 ```
 
-## Milestone 5: repeated-split robustness
+## Milestone 7: cross-fitted model comparison
 
-Milestone 5 reruns the same leakage-safe logistic T-learner over multiple deterministic,
-treatment-stratified splits. It reports per-seed AUUC, Qini-style performance, maximum Qini gain,
-and top-k uplift, then summarizes their mean, population standard deviation, minimum, maximum,
-and positive-Qini frequency. No new model family is introduced.
+Milestone 7 adds deterministic, treatment-stratified out-of-fold scoring and a reusable uplift
+model registry. It compares logistic T- and S-learners, a random-forest T-learner, a deterministic
+random-score baseline, and the synthetic oracle. Every row is scored exactly once by a model that
+did not train on that row. Existing AUUC, Qini, top-k, and bootstrap utilities are reused.
 
 Generate the data and all current reports:
 
@@ -207,13 +205,50 @@ generate-ab-report
 generate-uplift-evaluation
 generate-t-learner-report
 generate-t-learner-robustness
+generate-t-learner-bootstrap
+generate-crossfit-comparison
 ```
 
-The robustness report is written to `reports/t_learner_repeated_split_robustness.md`. Seeds and
-test fraction can be customized:
+The comparison report is written to `reports/crossfit_model_comparison.md`. Fold count, seed, and
+bootstrap count can be customized:
 
 ```bash
-generate-t-learner-robustness --seeds 0 1 2 3 4 --test-size 0.3
+generate-crossfit-comparison --folds 5 --seed 42 --n-bootstrap 100
+```
+
+Run the full test and lint suite:
+
+```bash
+python -m pytest
+python -m ruff check .
+```
+
+## Milestone 8: targeting-policy simulation
+
+Milestone 8 converts cross-fitted uplift rankings into offline business decisions. It compares
+fixed-depth, positive-uplift, matched-random, and synthetic-oracle policies under configurable
+conversion value, treatment cost, budget, capacity, and minimum-uplift assumptions. Incremental
+value is estimated from randomized outcomes within each selected group.
+
+Generate the data and all current reports:
+
+```bash
+generate-synthetic-experiment
+generate-ab-report
+generate-uplift-evaluation
+generate-t-learner-report
+generate-t-learner-robustness
+generate-t-learner-bootstrap
+generate-crossfit-comparison
+generate-policy-simulation
+```
+
+The policy report is written to `reports/targeting_policy_simulation.md`. Economic and operational
+constraints can be customized:
+
+```bash
+generate-policy-simulation --value-per-conversion 100 --treatment-cost 1 \
+  --budget 5000 --capacity-fraction 0.3 --min-predicted-uplift 0
 ```
 
 Run the full test and lint suite:
