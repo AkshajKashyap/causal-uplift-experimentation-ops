@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -45,6 +46,13 @@ class LogisticTLearner:
         self.treatment_model: Pipeline | None = None
 
     @property
+    def _scale_numeric_features(self) -> bool:
+        return True
+
+    def _make_classifier(self) -> Any:
+        return LogisticRegression(max_iter=1_000, random_state=self.seed)
+
+    @property
     def is_fitted(self) -> bool:
         """Return whether both arm-specific models have been fitted."""
         return self.control_model is not None and self.treatment_model is not None
@@ -65,11 +73,13 @@ class LogisticTLearner:
     def _build_pipeline(self) -> Pipeline:
         transformers: list[tuple[str, Pipeline, list[str]]] = []
         if self.numeric_feature_columns:
+            numeric_steps: list[tuple[str, Any]] = [
+                ("imputer", SimpleImputer(strategy="median"))
+            ]
+            if self._scale_numeric_features:
+                numeric_steps.append(("scaler", StandardScaler()))
             numeric_pipeline = Pipeline(
-                steps=[
-                    ("imputer", SimpleImputer(strategy="median")),
-                    ("scaler", StandardScaler()),
-                ]
+                steps=numeric_steps
             )
             transformers.append(
                 ("numeric", numeric_pipeline, list(self.numeric_feature_columns))
@@ -86,11 +96,10 @@ class LogisticTLearner:
             )
 
         preprocessor = ColumnTransformer(transformers=transformers, remainder="drop")
-        classifier = LogisticRegression(max_iter=1_000, random_state=self.seed)
         return Pipeline(
             steps=[
                 ("preprocessor", preprocessor),
-                ("classifier", classifier),
+                ("classifier", self._make_classifier()),
             ]
         )
 

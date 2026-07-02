@@ -8,6 +8,19 @@ from causal_uplift_experimentation_ops.evaluation.bootstrap import (
 from causal_uplift_experimentation_ops.evaluation.bootstrap_report import (
     generate_bootstrap_report,
 )
+from causal_uplift_experimentation_ops.evaluation.comparison import (
+    ModelComparisonResult,
+    compare_uplift_models,
+)
+from causal_uplift_experimentation_ops.evaluation.comparison_report import (
+    generate_comparison_report,
+)
+from causal_uplift_experimentation_ops.evaluation.crossfit import (
+    crossfit_uplift_model,
+    oracle_score_baseline,
+    random_score_baseline,
+    stratified_fold_assignments,
+)
 from causal_uplift_experimentation_ops.evaluation.metrics import (
     auuc_score,
     cumulative_uplift_curve,
@@ -38,20 +51,27 @@ __all__ = [
     "BootstrapSummary",
     "DEFAULT_ROBUSTNESS_SEEDS",
     "ExperimentSplit",
+    "ModelComparisonResult",
     "RobustnessSummary",
     "add_oracle_uplift_score",
     "auuc_score",
     "bootstrap_uplift_metrics",
+    "compare_uplift_models",
+    "crossfit_uplift_model",
     "cumulative_uplift_curve",
     "evaluate_t_learner_repeated_splits",
     "generate_robustness_report",
     "generate_bootstrap_report",
+    "generate_comparison_report",
     "generate_uplift_evaluation_report",
     "qini_coefficient",
     "qini_curve",
+    "oracle_score_baseline",
+    "random_score_baseline",
     "split_experiment_data",
     "summarize_repeated_split_results",
     "summarize_bootstrap_results",
+    "stratified_fold_assignments",
     "top_k_policy_summary",
     "uplift_ranking_table",
 ]

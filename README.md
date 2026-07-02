@@ -127,6 +127,39 @@ python -m pytest
 python -m ruff check .
 ```
 
+## Milestone 7: cross-fitted model comparison
+
+Milestone 7 adds deterministic, treatment-stratified out-of-fold scoring and a reusable uplift
+model registry. It compares logistic T- and S-learners, a random-forest T-learner, a deterministic
+random-score baseline, and the synthetic oracle. Every row is scored exactly once by a model that
+did not train on that row. Existing AUUC, Qini, top-k, and bootstrap utilities are reused.
+
+Generate the data and all current reports:
+
+```bash
+generate-synthetic-experiment
+generate-ab-report
+generate-uplift-evaluation
+generate-t-learner-report
+generate-t-learner-robustness
+generate-t-learner-bootstrap
+generate-crossfit-comparison
+```
+
+The comparison report is written to `reports/crossfit_model_comparison.md`. Fold count, seed, and
+bootstrap count can be customized:
+
+```bash
+generate-crossfit-comparison --folds 5 --seed 42 --n-bootstrap 100
+```
+
+Run the full test and lint suite:
+
+```bash
+python -m pytest
+python -m ruff check .
+```
+
 ## Milestone 6: bootstrap uncertainty
 
 Milestone 6 fits the existing T-learner on one fixed split, then resamples its scored test rows
