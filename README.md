@@ -329,3 +329,44 @@ Run the full test and lint suite:
 python -m pytest
 python -m ruff check .
 ```
+
+## Milestone 11: prospective randomized policy trial
+
+Milestone 11 turns the selected offline policies into prospective randomized trial designs.
+Cross-fitted Logistic S-learner scores define eligible users, who are newly randomized between
+policy treatment and a holdout. The synthetic simulator samples new conversion outcomes from a
+baseline probability plus known true uplift, then reports causal lift, confidence intervals,
+economic value, guardrails, normal-approximation power planning, and cumulative operational
+monitoring. The batch table is not presented as a formal sequential test.
+
+Generate the data and all current reports:
+
+```bash
+generate-synthetic-experiment
+generate-ab-report
+generate-uplift-evaluation
+generate-t-learner-report
+generate-t-learner-robustness
+generate-t-learner-bootstrap
+generate-crossfit-comparison
+generate-policy-simulation
+generate-policy-sensitivity
+generate-policy-uncertainty
+generate-policy-trial
+```
+
+The prospective simulator report is written to `reports/prospective_policy_trial.md`. Trial
+allocation, economics, planning targets, batches, and guardrails are configurable:
+
+```bash
+generate-policy-trial --holdout-fraction 0.2 --traffic-allocation 1 \
+  --value-per-conversion 100 --treatment-cost 1 --mde-target 0.02 \
+  --power 0.8 --batches 5 --minimum-sample-size 500
+```
+
+Run the full test and lint suite:
+
+```bash
+python -m pytest
+python -m ruff check .
+```

@@ -33,6 +33,7 @@ generate-crossfit-comparison = "causal_uplift_experimentation_ops.evaluation.com
 generate-policy-simulation = "causal_uplift_experimentation_ops.policy.report:main"
 generate-policy-sensitivity = "causal_uplift_experimentation_ops.policy.sensitivity_report:main"
 generate-policy-uncertainty = "causal_uplift_experimentation_ops.policy.uncertainty_report:main"
+generate-policy-trial = "causal_uplift_experimentation_ops.experiments.policy_trial_report:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
