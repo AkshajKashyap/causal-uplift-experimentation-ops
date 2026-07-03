@@ -27,7 +27,10 @@ EXAMPLE_USER = UserFeatures(
 def render_api_report(service: PolicyInferenceService) -> str:
     """Render endpoint, artifact, example, and staging limitation documentation."""
     version = service.version
-    response = service.score_user(EXAMPLE_USER)
+    response = service.score_user(
+        EXAMPLE_USER,
+        request_id="example-request-id",
+    )
     request_json = json.dumps(EXAMPLE_USER.model_dump(), indent=2)
     response_json = json.dumps(response.model_dump(), indent=2)
     limitations = "\n".join(
@@ -61,6 +64,7 @@ deployment.
 | POST | `/score` | Score one user |
 | POST | `/score-batch` | Score 1–{service.max_batch_size:,} users |
 | GET | `/manifest` | Safe manifest metadata and artifact filenames |
+| GET | `/metrics` | Process-local operational counters and mean latency |
 
 ## Example request
 
@@ -95,8 +99,10 @@ uvicorn causal_uplift_experimentation_ops.api.app:app --reload
 - Request validation covers schema and type constraints, not upstream feature freshness.
 - The fitted encoder tolerates unseen non-empty channel labels; their unseen category contributes
   no learned one-hot effect.
-- There is no authentication, authorization, rate limiting, durable request log, drift detection,
-  service-level objective, or high-availability design.
+- Optional staging API-key authentication and local JSONL audit logging are not substitutes for
+  enterprise identity, centralized logs, or authorization.
+- There is no rate limiting, drift detection, service-level objective, or high-availability
+  design.
 - Capacity and budget are applied only within each request batch, not across concurrent requests.
 
 ## Why this is staging, not production

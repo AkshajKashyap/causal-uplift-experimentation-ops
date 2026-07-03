@@ -26,6 +26,7 @@ deployment.
 | POST | `/score` | Score one user |
 | POST | `/score-batch` | Score 1–1,000 users |
 | GET | `/manifest` | Safe manifest metadata and artifact filenames |
+| GET | `/metrics` | Process-local operational counters and mean latency |
 
 ## Example request
 
@@ -44,6 +45,7 @@ deployment.
 
 ```json
 {
+  "request_id": "example-request-id",
   "user_id": 10001,
   "predicted_uplift": 0.06544670465022923,
   "predicted_control_conversion": 0.18442641753294473,
@@ -53,7 +55,8 @@ deployment.
   "policy_name": "all_positive_uplift",
   "model_name": "logistic_s_learner",
   "artifact_version": "1.0.0",
-  "reason": "predicted_uplift > 0"
+  "reason": "predicted_uplift > 0",
+  "estimated_treatment_cost": 1.0
 }
 ```
 
@@ -82,8 +85,10 @@ uvicorn causal_uplift_experimentation_ops.api.app:app --reload
 - Request validation covers schema and type constraints, not upstream feature freshness.
 - The fitted encoder tolerates unseen non-empty channel labels; their unseen category contributes
   no learned one-hot effect.
-- There is no authentication, authorization, rate limiting, durable request log, drift detection,
-  service-level objective, or high-availability design.
+- Optional staging API-key authentication and local JSONL audit logging are not substitutes for
+  enterprise identity, centralized logs, or authorization.
+- There is no rate limiting, drift detection, service-level objective, or high-availability
+  design.
 - Capacity and budget are applied only within each request batch, not across concurrent requests.
 
 ## Why this is staging, not production

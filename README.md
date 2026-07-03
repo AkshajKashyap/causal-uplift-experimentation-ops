@@ -548,3 +548,93 @@ python -m ruff check .
 The staging service report is written to `reports/api_staging_service.md`. The API has no
 authentication, centralized cross-request budget enforcement, durable request log, drift
 detection, or production availability guarantees; real prospective validation is still required.
+
+## Milestone 15: staging API safety and operational guardrails
+
+Milestone 15 adds optional staging API-key authentication, per-response request IDs, feature-free
+JSONL audit events, request-level recommendation and treatment-cost limits, highest-uplift
+suppression, and process-local operational metrics. These controls are intentionally lightweight:
+they improve local auditability but do not replace enterprise identity, a central budget store, or
+production observability.
+
+Generate the artifact and safety-control report:
+
+```bash
+generate-policy-artifact
+generate-api-safety-report
+```
+
+Start with authentication disabled (the default):
+
+```bash
+CAUSAL_UPLIFT_REQUIRE_API_KEY=false \
+  CAUSAL_UPLIFT_ENABLE_AUDIT_LOG=true \
+  serve-policy-api
+```
+
+Enable staging API-key authentication:
+
+```bash
+export CAUSAL_UPLIFT_API_KEY='replace-with-a-local-secret'
+CAUSAL_UPLIFT_REQUIRE_API_KEY=true \
+  CAUSAL_UPLIFT_ENABLE_AUDIT_LOG=true \
+  serve-policy-api
+```
+
+Call a protected single-user endpoint:
+
+```bash
+curl -sS -X POST http://127.0.0.1:8000/score \
+  -H 'Content-Type: application/json' \
+  -H "X-API-Key: ${CAUSAL_UPLIFT_API_KEY}" \
+  -d '{
+    "user_id": 10001,
+    "age": 35,
+    "prior_purchases": 4,
+    "avg_order_value": 82.5,
+    "days_since_last_purchase": 21,
+    "channel": "email"
+  }'
+```
+
+Limit a batch to the highest-uplift 10 recommendations and at most $25 of treatment cost:
+
+```bash
+curl -sS -X POST http://127.0.0.1:8000/score-batch \
+  -H 'Content-Type: application/json' \
+  -H "X-API-Key: ${CAUSAL_UPLIFT_API_KEY}" \
+  -d '{
+    "users": [
+      {
+        "user_id": 10001,
+        "age": 35,
+        "prior_purchases": 4,
+        "avg_order_value": 82.5,
+        "days_since_last_purchase": 21,
+        "channel": "email"
+      }
+    ],
+    "max_recommendations": 10,
+    "max_treatment_cost": 25,
+    "treatment_cost_per_user": 2.5
+  }'
+```
+
+Inspect process-local operational metrics:
+
+```bash
+curl -sS http://127.0.0.1:8000/metrics
+```
+
+When enabled, audit events are appended to `artifacts/api_audit_log.jsonl`. Raw features, outcomes,
+synthetic true uplift, and API keys are never written. Override safety settings with
+`CAUSAL_UPLIFT_*` environment variables documented in
+`reports/api_staging_safety_controls.md`.
+
+Run API safety tests, then all quality checks:
+
+```bash
+python -m pytest tests/test_api.py tests/test_api_safety.py
+python -m pytest
+python -m ruff check .
+```

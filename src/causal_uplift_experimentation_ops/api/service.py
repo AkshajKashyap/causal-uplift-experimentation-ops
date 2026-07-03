@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import json
+import math
+import uuid
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -10,15 +13,19 @@ import pandas as pd
 
 from causal_uplift_experimentation_ops.api.errors import (
     ArtifactLoadError,
+    GuardrailValidationError,
+    PolicyScoringError,
     PolicyServiceInputError,
 )
 from causal_uplift_experimentation_ops.api.schemas import (
+    BatchScoreResponse,
     ManifestResponse,
     PolicyResponse,
     ScoreResponse,
     UserFeatures,
     VersionResponse,
 )
+from causal_uplift_experimentation_ops.api.safety import StagingAPIConfig
 from causal_uplift_experimentation_ops.artifacts.batch_score import (
     score_policy_batch,
 )
@@ -58,12 +65,15 @@ class PolicyInferenceService:
     def __init__(
         self,
         artifact_path: Path | str = DEFAULT_ARTIFACT_PATH,
-        max_batch_size: int = 1_000,
+        max_batch_size: int | None = None,
+        safety_config: StagingAPIConfig | None = None,
     ) -> None:
-        if max_batch_size <= 0:
-            raise ValueError("max_batch_size must be positive")
+        settings = safety_config or StagingAPIConfig.from_environment()
+        if max_batch_size is not None:
+            settings = replace(settings, max_batch_size=max_batch_size)
         self.artifact_path = Path(artifact_path)
-        self.max_batch_size = max_batch_size
+        self.safety_config = settings
+        self.max_batch_size = settings.max_batch_size
         self.bundle: PersistedPolicyBundle
         self.config: PolicyDecisionConfig
         self.manifest: dict[str, object]
@@ -161,7 +171,13 @@ class PolicyInferenceService:
             artifact_files=sorted(str(filename) for filename in artifact_files),
         )
 
-    def score_users(self, users: list[UserFeatures]) -> list[ScoreResponse]:
+    def score_users(
+        self,
+        users: list[UserFeatures],
+        *,
+        request_id: str | None = None,
+        treatment_cost_per_user: float | None = None,
+    ) -> list[ScoreResponse]:
         """Score a bounded request with the shared artifact batch-scoring path."""
         if not users:
             raise PolicyServiceInputError("Batch request must contain at least one user")
@@ -174,8 +190,21 @@ class PolicyInferenceService:
             scores = score_policy_batch(frame, self.bundle)
         except ValueError as error:
             raise PolicyServiceInputError(str(error)) from error
+        except Exception as error:
+            raise PolicyScoringError("Frozen policy scoring failed") from error
+        resolved_request_id = request_id or str(uuid.uuid4())
+        treatment_cost = (
+            self.safety_config.default_treatment_cost_per_user
+            if treatment_cost_per_user is None
+            else treatment_cost_per_user
+        )
+        if not math.isfinite(treatment_cost) or treatment_cost < 0:
+            raise GuardrailValidationError(
+                "treatment_cost_per_user must be finite and non-negative"
+            )
         return [
             ScoreResponse(
+                request_id=resolved_request_id,
                 user_id=int(row.user_id),
                 predicted_uplift=float(row.predicted_uplift),
                 predicted_control_conversion=float(
@@ -190,10 +219,112 @@ class PolicyInferenceService:
                 model_name=str(row.model_name),
                 artifact_version=str(row.artifact_version),
                 reason=self.config.policy_rule,
+                estimated_treatment_cost=(
+                    treatment_cost if int(row.recommended_treatment) else 0.0
+                ),
             )
             for row in scores.itertuples(index=False)
         ]
 
-    def score_user(self, user: UserFeatures) -> ScoreResponse:
+    def score_user(
+        self,
+        user: UserFeatures,
+        *,
+        request_id: str | None = None,
+    ) -> ScoreResponse:
         """Score one user through the same deterministic batch path."""
-        return self.score_users([user])[0]
+        return self.score_users([user], request_id=request_id)[0]
+
+    def score_batch(
+        self,
+        users: list[UserFeatures],
+        *,
+        request_id: str | None = None,
+        max_recommendations: int | None = None,
+        max_treatment_cost: float | None = None,
+        treatment_cost_per_user: float | None = None,
+    ) -> BatchScoreResponse:
+        """Score all users, then retain the highest-uplift allowed recommendations."""
+        for name, value in (
+            ("max_recommendations", max_recommendations),
+            ("max_treatment_cost", max_treatment_cost),
+            ("treatment_cost_per_user", treatment_cost_per_user),
+        ):
+            if value is not None and (
+                not math.isfinite(float(value)) or float(value) < 0
+            ):
+                raise GuardrailValidationError(
+                    f"{name} must be finite and non-negative"
+                )
+        resolved_request_id = request_id or str(uuid.uuid4())
+        cost_per_user = (
+            self.safety_config.default_treatment_cost_per_user
+            if treatment_cost_per_user is None
+            else treatment_cost_per_user
+        )
+        scores = self.score_users(
+            users,
+            request_id=resolved_request_id,
+            treatment_cost_per_user=cost_per_user,
+        )
+        original_count = sum(score.recommended_treatment for score in scores)
+        allowed_count = original_count
+
+        if self.safety_config.enable_budget_guardrail:
+            recommendation_limits = [
+                value
+                for value in (
+                    self.safety_config.max_recommendations_per_run,
+                    max_recommendations,
+                )
+                if value is not None
+            ]
+            if recommendation_limits:
+                allowed_count = min(allowed_count, *recommendation_limits)
+            cost_limits = [
+                value
+                for value in (
+                    self.safety_config.max_treatment_cost_per_run,
+                    max_treatment_cost,
+                )
+                if value is not None
+            ]
+            if cost_limits and cost_per_user > 0:
+                allowed_by_cost = int(
+                    math.floor(min(cost_limits) / cost_per_user)
+                )
+                allowed_count = min(allowed_count, allowed_by_cost)
+
+        recommended_rank = sorted(
+            (
+                (index, score.predicted_uplift)
+                for index, score in enumerate(scores)
+                if score.recommended_treatment
+            ),
+            key=lambda item: item[1],
+            reverse=True,
+        )
+        retained = {index for index, _ in recommended_rank[:allowed_count]}
+        final_scores = [
+            score.model_copy(
+                update={
+                    "recommended_treatment": int(index in retained),
+                    "estimated_treatment_cost": (
+                        cost_per_user if index in retained else 0.0
+                    ),
+                }
+            )
+            for index, score in enumerate(scores)
+        ]
+        final_count = len(retained)
+        suppressed = original_count - final_count
+        return BatchScoreResponse(
+            request_id=resolved_request_id,
+            batch_size=len(final_scores),
+            scores=final_scores,
+            original_recommended_count=original_count,
+            final_recommended_count=final_count,
+            recommendations_suppressed_by_budget=suppressed,
+            estimated_treatment_cost=final_count * cost_per_user,
+            guardrail_applied=suppressed > 0,
+        )

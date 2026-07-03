@@ -23,6 +23,7 @@ class UserFeatures(BaseModel):
 class ScoreResponse(BaseModel):
     """Auditable potential-outcome predictions and policy decision."""
 
+    request_id: str
     user_id: int
     predicted_uplift: float
     predicted_control_conversion: float
@@ -33,6 +34,7 @@ class ScoreResponse(BaseModel):
     model_name: str
     artifact_version: str
     reason: str
+    estimated_treatment_cost: float
 
 
 class BatchScoreRequest(BaseModel):
@@ -41,13 +43,22 @@ class BatchScoreRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     users: list[UserFeatures]
+    max_recommendations: int | None = Field(default=None, ge=0)
+    max_treatment_cost: float | None = Field(default=None, ge=0)
+    treatment_cost_per_user: float | None = Field(default=None, ge=0)
 
 
 class BatchScoreResponse(BaseModel):
     """Batch size plus one deterministic result per requested user."""
 
+    request_id: str
     batch_size: int
     scores: list[ScoreResponse]
+    original_recommended_count: int
+    final_recommended_count: int
+    recommendations_suppressed_by_budget: int
+    estimated_treatment_cost: float
+    guardrail_applied: bool
 
 
 class HealthResponse(BaseModel):
@@ -101,3 +112,17 @@ class ManifestResponse(BaseModel):
     feature_columns_fingerprint: str
     config_fingerprint: str
     artifact_files: list[str]
+
+
+class MetricsResponse(BaseModel):
+    """Process-local request, user, recommendation, error, and latency metrics."""
+
+    total_score_requests: int
+    total_batch_requests: int
+    total_users_scored: int
+    total_recommendations: int
+    total_errors: int
+    mean_latency_ms: float
+    artifact_version: str
+    model_name: str
+    policy_name: str
