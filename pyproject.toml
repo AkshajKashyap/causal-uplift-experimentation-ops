@@ -16,6 +16,7 @@ dependencies = [
     "statsmodels",
     "matplotlib",
     "fastapi",
+    "httpx2",
     "uvicorn",
     "streamlit",
     "pydantic",
@@ -38,6 +39,8 @@ generate-policy-trial = "causal_uplift_experimentation_ops.experiments.policy_tr
 generate-experiment-planning = "causal_uplift_experimentation_ops.experiments.preregistration_report:main"
 generate-policy-artifact = "causal_uplift_experimentation_ops.artifacts.report:main"
 score-policy-batch = "causal_uplift_experimentation_ops.artifacts.batch_score:main"
+serve-policy-api = "causal_uplift_experimentation_ops.api.app:main"
+generate-api-staging-report = "causal_uplift_experimentation_ops.api.report:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

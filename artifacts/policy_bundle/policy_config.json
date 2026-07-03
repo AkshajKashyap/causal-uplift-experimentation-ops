@@ -2,7 +2,7 @@
   "artifact_version": "1.0.0",
   "budget": null,
   "capacity_fraction": null,
-  "creation_timestamp": "2026-07-03T06:26:59+00:00",
+  "creation_timestamp": "2026-07-03T06:39:51+00:00",
   "evaluation_report_paths": [
     "reports/crossfit_model_comparison.md",
     "reports/targeting_policy_simulation.md",

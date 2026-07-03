@@ -484,3 +484,67 @@ Run the full test and lint suite:
 python -m pytest
 python -m ruff check .
 ```
+
+## Milestone 14: FastAPI staging inference service
+
+Milestone 14 serves the already-frozen policy artifact through a local/staging FastAPI
+application. The service never retrains the model: it validates pre-treatment request fields,
+reuses the artifact batch-scoring path, applies the frozen policy rule, and returns predictions
+with artifact, model, and policy identity. It is intentionally not a production deployment.
+
+Generate or refresh the required policy artifact:
+
+```bash
+generate-policy-artifact
+generate-api-staging-report
+```
+
+Start the API on the default local interface:
+
+```bash
+serve-policy-api --host 127.0.0.1 --port 8000
+```
+
+For development reload:
+
+```bash
+uvicorn causal_uplift_experimentation_ops.api.app:app --reload
+```
+
+Check artifact readiness:
+
+```bash
+curl -sS http://127.0.0.1:8000/health
+```
+
+Score one synthetic-like user without outcome or treatment fields:
+
+```bash
+curl -sS -X POST http://127.0.0.1:8000/score \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "user_id": 10001,
+    "age": 35,
+    "prior_purchases": 4,
+    "avg_order_value": 82.5,
+    "days_since_last_purchase": 21,
+    "channel": "email"
+  }'
+```
+
+Run only the API tests:
+
+```bash
+python -m pytest tests/test_api.py
+```
+
+Run all tests and lint:
+
+```bash
+python -m pytest
+python -m ruff check .
+```
+
+The staging service report is written to `reports/api_staging_service.md`. The API has no
+authentication, centralized cross-request budget enforcement, durable request log, drift
+detection, or production availability guarantees; real prospective validation is still required.
