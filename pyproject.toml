@@ -42,6 +42,8 @@ score-policy-batch = "causal_uplift_experimentation_ops.artifacts.batch_score:ma
 serve-policy-api = "causal_uplift_experimentation_ops.api.app:main"
 generate-api-staging-report = "causal_uplift_experimentation_ops.api.report:main"
 generate-api-safety-report = "causal_uplift_experimentation_ops.api.safety_report:main"
+generate-api-audit-smoke-log = "causal_uplift_experimentation_ops.monitoring.audit:main"
+generate-staging-observability = "causal_uplift_experimentation_ops.monitoring.report:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -6,7 +6,7 @@
 - Model: **logistic_s_learner**
 - Policy: **all_positive_uplift**
 - Decision rule: **predicted_uplift > 0**
-- Created: 2026-07-03T08:10:02+00:00
+- Created: 2026-07-03T08:33:17+00:00
 - Random seed: 42
 - Config fingerprint: `38cee44e01f2f092ba0eb179348fe3980381fc81fe49c45baf32d41121db5725`
 

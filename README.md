@@ -638,3 +638,60 @@ python -m pytest tests/test_api.py tests/test_api_safety.py
 python -m pytest
 python -m ruff check .
 ```
+
+## Milestone 16: offline observability and artifact promotion gates
+
+Milestone 16 adds snapshot-based input and prediction drift checks, feature-free API audit-log
+analysis, an operational health summary, and deterministic artifact promotion gates. This is
+local/staging monitoring: it does not provide continuous telemetry, alerting, tracing, or
+production approval.
+
+Regenerate the frozen policy artifact and its default batch scores:
+
+```bash
+generate-policy-artifact
+score-policy-batch \
+  --bundle artifacts/policy_bundle \
+  --input data/processed/synthetic_experiment.csv \
+  --output artifacts/policy_bundle/batch_scores.csv
+```
+
+Generate a deterministic, feature-free smoke audit log without starting the API server:
+
+```bash
+generate-api-audit-smoke-log
+```
+
+Run all staging observability checks and the promotion gate:
+
+```bash
+generate-staging-observability
+```
+
+To compare a new pre-score input snapshot against the reference data, pass it explicitly:
+
+```bash
+generate-staging-observability --current-input path/to/current_input.csv
+```
+
+The generated report is written to `reports/staging_observability_report.md`; the smoke audit log
+is written to `artifacts/api_audit_log.jsonl`.
+
+Promotion decisions mean:
+
+- `promote`: required staging checks passed; this permits only the next controlled staging phase.
+- `hold`: evidence or operational checks are incomplete, warning-level, or synthetic-only.
+- `rollback`: drift, artifact identity, audit health, or trial guardrails failed.
+
+Because the current evidence is synthetic-only, the default decision remains `hold` pending a
+real pre-registered randomized trial. The optional `--accept-simulated-trial` flag can exercise a
+staging-only gate path, but it is not production approval.
+
+Run the monitoring tests and all quality checks:
+
+```bash
+python -m pytest tests/test_monitoring.py
+python -m pytest
+python -m ruff check .
+git diff --check
+```
