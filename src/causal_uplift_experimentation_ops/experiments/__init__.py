@@ -13,6 +13,19 @@ from causal_uplift_experimentation_ops.experiments.analysis import (
     summarize_experiment,
     treatment_control_summary,
 )
+from causal_uplift_experimentation_ops.experiments.design_optimization import (
+    ALL_POSITIVE_POLICY,
+    DEFAULT_HOLDOUT_FRACTIONS,
+    DEFAULT_TARGET_MDES,
+    DEFAULT_TRAFFIC_MULTIPLIERS,
+    TOP_20_POLICY,
+    PolicyPlanningInput,
+    generate_design_optimization_report,
+    generate_trial_design_scenarios,
+    optimize_trial_designs,
+    planning_inputs_from_trial_runs,
+    required_total_sample_size,
+)
 from causal_uplift_experimentation_ops.experiments.policy_trial import (
     NOT_ELIGIBLE,
     NOT_ENROLLED,
@@ -38,9 +51,22 @@ from causal_uplift_experimentation_ops.experiments.policy_trial_report import (
     generate_policy_trial_report,
     run_default_policy_trials,
 )
+from causal_uplift_experimentation_ops.experiments.preregistration import (
+    PreregistrationConfig,
+    generate_preregistration_report,
+    render_preregistration,
+)
+from causal_uplift_experimentation_ops.experiments.preregistration_report import (
+    PlanningReportResult,
+    generate_experiment_planning_reports,
+)
 from causal_uplift_experimentation_ops.experiments.report import generate_ab_report
 
 __all__ = [
+    "ALL_POSITIVE_POLICY",
+    "DEFAULT_HOLDOUT_FRACTIONS",
+    "DEFAULT_TARGET_MDES",
+    "DEFAULT_TRAFFIC_MULTIPLIERS",
     "ExperimentSummary",
     "GuardrailConfig",
     "NOT_ELIGIBLE",
@@ -48,9 +74,13 @@ __all__ = [
     "POLICY_HOLDOUT",
     "POLICY_TREATMENT",
     "PolicyTrialConfig",
+    "PolicyPlanningInput",
     "PolicyTrialRun",
     "PolicyTrialSummary",
+    "PlanningReportResult",
     "PowerSummary",
+    "PreregistrationConfig",
+    "TOP_20_POLICY",
     "analyze_policy_trial",
     "approximate_power",
     "approximate_proportion_difference_standard_error",
@@ -62,10 +92,18 @@ __all__ = [
     "conversion_relative_lift",
     "conversion_treatment_effect",
     "generate_ab_report",
+    "generate_design_optimization_report",
+    "generate_experiment_planning_reports",
     "generate_policy_trial_report",
+    "generate_preregistration_report",
+    "generate_trial_design_scenarios",
     "minimum_detectable_effect",
     "numeric_covariate_balance",
+    "optimize_trial_designs",
+    "planning_inputs_from_trial_runs",
+    "render_preregistration",
     "required_sample_size_per_group",
+    "required_total_sample_size",
     "run_default_policy_trials",
     "run_policy_trial",
     "simulate_prospective_outcomes",

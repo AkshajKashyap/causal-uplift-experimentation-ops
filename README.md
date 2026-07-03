@@ -370,3 +370,52 @@ Run the full test and lint suite:
 python -m pytest
 python -m ruff check .
 ```
+
+## Milestone 12: experiment pre-registration and design optimization
+
+Milestone 12 freezes the intended estimand, hypotheses, outcomes, analysis population, guardrails,
+decision rules, stopping rules, and limitations before enrollment. It also evaluates all-positive
+and top-20% policy trials over holdout fractions from 10% to 50%, accumulated traffic from 1x to
+10x, and target conversion lifts from 1% to 5%. Recommendations optimize adequate power, treatment
+cost, and rough expected value using transparent normal-approximation planning assumptions.
+
+Generate the synthetic data and every major report from Milestones 2–12:
+
+```bash
+generate-synthetic-experiment
+generate-ab-report
+generate-uplift-evaluation
+generate-t-learner-report
+generate-t-learner-robustness
+generate-t-learner-bootstrap
+generate-crossfit-comparison
+generate-policy-simulation
+generate-policy-sensitivity
+generate-policy-uncertainty
+generate-policy-trial
+generate-experiment-planning
+```
+
+The planning command writes both `reports/experiment_preregistration.md` and
+`reports/trial_design_optimization.md`. Pre-registration and optimization use the same frozen
+alpha, power, MDE, and economic assumptions:
+
+```bash
+generate-experiment-planning --target-mde 0.02 --target-power 0.8 \
+  --alpha 0.05 --value-per-conversion 100 --treatment-cost 1
+```
+
+Custom artifact paths are supported:
+
+```bash
+generate-experiment-planning \
+  --preregistration-output reports/experiment_preregistration.md \
+  --optimization-output reports/trial_design_optimization.md
+```
+
+Run the full test and lint suite:
+
+```bash
+python -m pytest
+python -m ruff check .
+```
