@@ -419,3 +419,68 @@ Run the full test and lint suite:
 python -m pytest
 python -m ruff check .
 ```
+
+## Milestone 13: deployable offline policy artifact
+
+Milestone 13 freezes the selected Logistic S-learner / all-positive policy into a versioned,
+auditable offline bundle. The package records its exact features, economics, trial recommendation,
+evidence paths, deterministic dataset/config fingerprints, fitted preprocessing and model, known
+limitations, and intended use. It also supports reproducible batch scoring without emitting
+synthetic `true_uplift` by default.
+
+Generate the synthetic input and all major reports from Milestones 2–12:
+
+```bash
+generate-synthetic-experiment
+generate-ab-report
+generate-uplift-evaluation
+generate-t-learner-report
+generate-t-learner-robustness
+generate-t-learner-bootstrap
+generate-crossfit-comparison
+generate-policy-simulation
+generate-policy-sensitivity
+generate-policy-uncertainty
+generate-policy-trial
+generate-experiment-planning
+```
+
+Train, freeze, audit, and smoke-test the selected policy artifact:
+
+```bash
+generate-policy-artifact
+```
+
+The command writes:
+
+- `artifacts/policy_bundle/model.joblib`
+- `artifacts/policy_bundle/policy_config.json`
+- `artifacts/policy_bundle/manifest.json`
+- `artifacts/policy_bundle/feature_columns.json`
+- `artifacts/policy_bundle/value_assumptions.json`
+- `artifacts/policy_bundle/README.md`
+- `artifacts/policy_bundle/batch_scores.csv`
+- `reports/policy_card.md`
+- `reports/policy_artifact_manifest.md`
+
+The model binary and generated batch scores are intentionally ignored by Git. The small JSON
+metadata and bundle README remain visible for portfolio review and auditing.
+
+Score another compatible CSV with the frozen bundle:
+
+```bash
+score-policy-batch \
+  --bundle artifacts/policy_bundle \
+  --input data/processed/synthetic_experiment.csv \
+  --output artifacts/policy_bundle/batch_scores.csv
+```
+
+Use `--include-synthetic-debug` only for explicit synthetic diagnostics; production-style output
+excludes `true_uplift`.
+
+Run the full test and lint suite:
+
+```bash
+python -m pytest
+python -m ruff check .
+```

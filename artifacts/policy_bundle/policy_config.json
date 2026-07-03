@@ -1,0 +1,39 @@
+{
+  "artifact_version": "1.0.0",
+  "budget": null,
+  "capacity_fraction": null,
+  "creation_timestamp": "2026-07-03T06:26:59+00:00",
+  "evaluation_report_paths": [
+    "reports/crossfit_model_comparison.md",
+    "reports/targeting_policy_simulation.md",
+    "reports/policy_sensitivity_analysis.md",
+    "reports/policy_value_uncertainty.md",
+    "reports/prospective_policy_trial.md",
+    "reports/trial_design_optimization.md"
+  ],
+  "experiment_preregistration_path": "reports/experiment_preregistration.md",
+  "intended_use": "Auditable offline batch scoring and prospective randomized policy validation.",
+  "limitations": [
+    "The policy has been trained and evaluated only on synthetic data.",
+    "Prospective real-world randomized validation is required before deployment.",
+    "All-positive wins without budget or capacity constraints largely because broad treatment is profitable under the configured economics.",
+    "Ranking quality matters more when treatment capacity or budget is constrained.",
+    "Economic conclusions may change with treatment cost or conversion value."
+  ],
+  "model_name": "logistic_s_learner",
+  "out_of_scope_use": "Automated production treatment, high-stakes individual decisions, or use outside the documented population without new validation.",
+  "policy_name": "all_positive_uplift",
+  "policy_rule": "predicted_uplift > 0",
+  "random_seed": 42,
+  "recommended_trial_design": "Before production serving, run the all-positive randomized validation at 1x accumulated traffic with a 50% holdout.",
+  "selected_feature_columns": [
+    "age",
+    "prior_purchases",
+    "avg_order_value",
+    "days_since_last_purchase",
+    "channel"
+  ],
+  "training_data_fingerprint": "543bdc505f595f138f9e4fe487723f4958cf0ec888c3d9321435c1ce52ad0a57",
+  "treatment_cost_per_user": 1.0,
+  "value_per_conversion": 100.0
+}
