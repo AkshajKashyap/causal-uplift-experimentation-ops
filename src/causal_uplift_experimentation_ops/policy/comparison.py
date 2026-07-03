@@ -23,6 +23,20 @@ class ModelPolicyComparisonResult:
     config: PolicyValueConfig
 
 
+def compare_scored_model_policies(
+    scored_predictions: dict[str, pd.DataFrame],
+    config: PolicyValueConfig,
+    seed: int = 42,
+) -> pd.DataFrame:
+    """Apply identical policy rules to already-scored model predictions."""
+    policy_frames = []
+    for model_name, scored in scored_predictions.items():
+        policies = compare_policies(scored, config=config, seed=seed)
+        policies.insert(0, "model", model_name)
+        policy_frames.append(policies)
+    return pd.concat(policy_frames, ignore_index=True)
+
+
 def compare_model_policies(
     data: pd.DataFrame,
     config: PolicyValueConfig | None = None,
@@ -36,13 +50,7 @@ def compare_model_policies(
         n_splits=n_splits,
         seed=seed,
     )
-    policy_frames = []
-    for model_name, scored in predictions.items():
-        policies = compare_policies(scored, config=assumptions, seed=seed)
-        policies.insert(0, "model", model_name)
-        policy_frames.append(policies)
-
-    comparison = pd.concat(policy_frames, ignore_index=True)
+    comparison = compare_scored_model_policies(predictions, assumptions, seed=seed)
     return ModelPolicyComparisonResult(
         comparison=comparison,
         scored_predictions=predictions,

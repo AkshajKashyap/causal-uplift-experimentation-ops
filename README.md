@@ -257,3 +257,75 @@ Run the full test and lint suite:
 python -m pytest
 python -m ruff check .
 ```
+
+## Milestone 9: policy sensitivity analysis
+
+Milestone 9 holds cross-fitted scores fixed while varying conversion value, treatment cost,
+budget, and capacity. It reports one-way and two-way scenario results, recommendation stability,
+learned-versus-random and learned-versus-oracle value, and deterministic policy break-even
+thresholds.
+
+Generate the data and all current reports:
+
+```bash
+generate-synthetic-experiment
+generate-ab-report
+generate-uplift-evaluation
+generate-t-learner-report
+generate-t-learner-robustness
+generate-t-learner-bootstrap
+generate-crossfit-comparison
+generate-policy-simulation
+generate-policy-sensitivity
+```
+
+The sensitivity report is written to `reports/policy_sensitivity_analysis.md`. Base assumptions
+can be customized before applying the built-in sensitivity grids:
+
+```bash
+generate-policy-sensitivity --value-per-conversion 100 --treatment-cost 1 \
+  --budget 5000 --capacity-fraction 0.3
+```
+
+Run the full test and lint suite:
+
+```bash
+python -m pytest
+python -m ruff check .
+```
+
+## Milestone 10: policy value uncertainty
+
+Milestone 10 applies a paired, treatment-stratified bootstrap to cross-fitted policy candidates.
+It reports uncertainty for net value and ROI, probabilities of profitability and beating matched
+random targeting, synthetic-oracle regret, and regret versus the best policy in each replicate.
+
+Generate the data and all current reports:
+
+```bash
+generate-synthetic-experiment
+generate-ab-report
+generate-uplift-evaluation
+generate-t-learner-report
+generate-t-learner-robustness
+generate-t-learner-bootstrap
+generate-crossfit-comparison
+generate-policy-simulation
+generate-policy-sensitivity
+generate-policy-uncertainty
+```
+
+The report is written to `reports/policy_value_uncertainty.md`. Bootstrap count and value
+assumptions can be customized:
+
+```bash
+generate-policy-uncertainty --n-bootstrap 100 --value-per-conversion 100 \
+  --treatment-cost 1 --folds 5 --seed 42
+```
+
+Run the full test and lint suite:
+
+```bash
+python -m pytest
+python -m ruff check .
+```

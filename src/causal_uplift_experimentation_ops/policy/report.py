@@ -14,6 +14,7 @@ from causal_uplift_experimentation_ops.policy.comparison import (
     ModelPolicyComparisonResult,
     compare_model_policies,
 )
+from causal_uplift_experimentation_ops.policy.simulation import LEARNED_POLICY_NAMES
 from causal_uplift_experimentation_ops.policy.value import PolicyValueConfig
 
 DEFAULT_INPUT_PATH = Path("data/processed/synthetic_experiment.csv")
@@ -44,7 +45,10 @@ def _best_row(frame: pd.DataFrame, metric: str) -> pd.Series:
 
 def _interpret(result: ModelPolicyComparisonResult) -> str:
     table = result.comparison
-    learned = table[table["model"].isin(DEFAULT_MODEL_NAMES)]
+    learned = table[
+        table["model"].isin(DEFAULT_MODEL_NAMES)
+        & table["policy_name"].isin(LEARNED_POLICY_NAMES)
+    ]
     best_net = _best_row(learned, "net_value")
     random_best = _best_row(table[table["model"] == "random_baseline"], "net_value")
     oracle_best = _best_row(table[table["model"] == "oracle_baseline"], "net_value")
@@ -96,7 +100,10 @@ def render_policy_report(
     )
     assumptions = result.config
     table = result.comparison
-    learned = table[table["model"].isin(DEFAULT_MODEL_NAMES)]
+    learned = table[
+        table["model"].isin(DEFAULT_MODEL_NAMES)
+        & table["policy_name"].isin(LEARNED_POLICY_NAMES)
+    ]
     best_net = _best_row(learned, "net_value")
     best_roi = _best_row(learned, "roi")
     model_names = ", ".join(MODEL_LABELS[name] for name in result.scored_predictions)

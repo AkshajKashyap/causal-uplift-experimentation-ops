@@ -31,6 +31,8 @@ generate-t-learner-robustness = "causal_uplift_experimentation_ops.evaluation.ro
 generate-t-learner-bootstrap = "causal_uplift_experimentation_ops.evaluation.bootstrap_report:main"
 generate-crossfit-comparison = "causal_uplift_experimentation_ops.evaluation.comparison_report:main"
 generate-policy-simulation = "causal_uplift_experimentation_ops.policy.report:main"
+generate-policy-sensitivity = "causal_uplift_experimentation_ops.policy.sensitivity_report:main"
+generate-policy-uncertainty = "causal_uplift_experimentation_ops.policy.uncertainty_report:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

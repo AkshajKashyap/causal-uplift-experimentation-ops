@@ -20,6 +20,12 @@ DEFAULT_POLICY_NAMES = (
     "random_matched_20_percent",
     "oracle_matched_20_percent",
 )
+LEARNED_POLICY_NAMES = (
+    "top_10_percent",
+    "top_20_percent",
+    "top_30_percent",
+    "positive_uplift",
+)
 
 
 def _validate_scored_data(scored: pd.DataFrame) -> None:
