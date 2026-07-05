@@ -1,0 +1,17 @@
+.git
+.agents
+.codex
+.venv
+.pytest_cache
+.ruff_cache
+**/__pycache__
+**/*.pyc
+*.egg-info
+build
+dist
+data/raw
+data/processed
+artifacts/**/*.joblib
+artifacts/**/batch_scores.csv
+artifacts/**/*.jsonl
+.DS_Store

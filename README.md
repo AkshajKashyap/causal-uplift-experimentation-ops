@@ -2,6 +2,70 @@
 
 Production-style causal ML system for A/B testing, uplift modeling, CATE estimation, targeting policy simulation, FastAPI serving, and monitoring.
 
+## Quickstart
+
+Create an environment and install the package:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+make install
+```
+
+Generate the deterministic experiment data and run the portfolio workflow:
+
+```bash
+make generate-data
+make smoke
+```
+
+Start the staging API after the policy artifact exists:
+
+```bash
+make artifact
+serve-policy-api --host 0.0.0.0 --port 8000
+```
+
+Run tests and lint independently:
+
+```bash
+make test
+make lint
+```
+
+Inspect installed package and policy metadata:
+
+```bash
+causal-uplift-ops --version
+causal-uplift-ops project-info
+```
+
+## Portfolio demo path
+
+`make smoke` is the one-command reviewer path. It regenerates the main data, A/B and cross-fitted
+evidence, frozen artifact, API report, deterministic audit log, observability report, tests, and
+lint checks.
+
+After it finishes, start with:
+
+- `reports/crossfit_model_comparison.md`
+- `reports/policy_card.md`
+- `artifacts/policy_bundle/manifest.json`
+- `reports/api_staging_service.md`
+- `reports/staging_observability_report.md`
+
+For the system design and interview narrative, see `docs/architecture.md`,
+`docs/reproducibility.md`, and `docs/portfolio_review.md`.
+
+## Current promotion status
+
+- A versioned staging artifact exists.
+- The current promotion decision is **hold**.
+- Evidence is synthetic-only, and the all-positive policy produces a 100% recommendation-rate
+  warning.
+- The next real step is the pre-registered prospective randomized validation—not production
+  rollout.
+
 ## Goal
 
 Estimate which users benefit from an intervention, not just which users are likely to convert.

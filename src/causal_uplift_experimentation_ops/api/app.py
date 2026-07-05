@@ -44,6 +44,7 @@ from causal_uplift_experimentation_ops.api.service import (
     DEFAULT_ARTIFACT_PATH,
     PolicyInferenceService,
 )
+from causal_uplift_experimentation_ops.artifacts.manifest import package_version
 
 PROTECTED_ENDPOINTS = {"/score", "/score-batch", "/manifest", "/policy"}
 AUDITED_ENDPOINTS = {"/score", "/score-batch"}
@@ -60,7 +61,7 @@ def create_app(
         settings = replace(settings, max_batch_size=max_batch_size)
     application = FastAPI(
         title="Causal Uplift Policy Staging API",
-        version="0.1.0",
+        version=package_version(),
         description=(
             "Local/staging inference for a frozen synthetic uplift policy artifact. "
             "This service does not train models or authorize production treatment."

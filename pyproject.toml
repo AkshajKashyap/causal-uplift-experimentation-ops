@@ -16,15 +16,19 @@ dependencies = [
     "statsmodels",
     "matplotlib",
     "fastapi",
-    "httpx",
     "uvicorn",
-    "streamlit",
     "pydantic",
+]
+
+[project.optional-dependencies]
+dev = [
+    "httpx",
     "pytest",
     "ruff",
 ]
 
 [project.scripts]
+causal-uplift-ops = "causal_uplift_experimentation_ops.cli:main"
 generate-synthetic-experiment = "causal_uplift_experimentation_ops.data.generation:main"
 generate-ab-report = "causal_uplift_experimentation_ops.experiments.report:main"
 generate-uplift-evaluation = "causal_uplift_experimentation_ops.evaluation.report:main"

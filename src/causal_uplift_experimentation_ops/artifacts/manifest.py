@@ -5,21 +5,12 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import asdict, dataclass
-from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any, Mapping
 
 import pandas as pd
 
-PACKAGE_NAME = "causal-uplift-experimentation-ops"
-
-
-def package_version() -> str:
-    """Return the installed package version with a source-tree fallback."""
-    try:
-        return version(PACKAGE_NAME)
-    except PackageNotFoundError:
-        return "0.1.0"
+from causal_uplift_experimentation_ops._version import package_version
 
 
 def canonical_json(value: Any) -> str:
