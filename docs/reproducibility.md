@@ -46,7 +46,7 @@ The quickest full verification is:
 make smoke
 ```
 
-It regenerates the default 10,000-row dataset with seed 42, the A/B report, a compact cross-fitted
+It regenerates the default 10,000-row dataset with seed 42, the A/B report, the cross-fitted
 comparison, the selected policy artifact, API documentation, deterministic audit events, and the
 staging observability report before running tests and lint.
 

@@ -1,50 +1,100 @@
 # Causal Uplift Experimentation Ops
 
-Production-style causal ML system for A/B testing, uplift modeling, CATE estimation, targeting policy simulation, FastAPI serving, and monitoring.
+[![Python 3.11 | 3.12](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](pyproject.toml)
+[![Tests: 201 passed](https://img.shields.io/badge/tests-201%20passed-brightgreen)](reports/portfolio/verification_0.1.0.md)
+[![Ruff: passing](https://img.shields.io/badge/ruff-passing-brightgreen)](reports/portfolio/verification_0.1.0.md)
+[![CI](https://github.com/AkshajKashyap/causal-uplift-experimentation-ops/actions/workflows/ci.yml/badge.svg)](https://github.com/AkshajKashyap/causal-uplift-experimentation-ops/actions/workflows/ci.yml)
+
+A reproducible synthetic causal ML workflow that starts with a randomized experiment and ends
+with an auditable treatment-policy artifact, staging API, offline monitoring, and an explicit
+release decision.
+
+## What is this?
+
+The project asks a decision-focused question: **who benefits enough from an intervention to
+justify treatment?** It combines average A/B effects with heterogeneous-effect ranking,
+randomized policy-value estimation, uncertainty, trial planning, artifact management, and staging
+operations.
+
+This matters because a promising model score is not a launch decision. A credible path also needs
+leakage controls, randomized evaluation, economic assumptions, reproducible artifacts, serving
+contracts, monitoring, and a gate willing to say “not yet.”
+
+The repository demonstrates:
+
+- randomized experiment analysis and covariate balance;
+- leakage-safe uplift models, cross-fitting, AUUC/Qini-style evaluation, and uncertainty;
+- policy simulation under cost, capacity, budget, and sensitivity assumptions;
+- prospective trial design and pre-registration;
+- versioned artifact freezing, batch scoring, and FastAPI staging inference;
+- safety controls, audit logging, drift checks, health summaries, and promotion gates;
+- reproducible CLIs, Make targets, Docker support, tests, and GitHub Actions CI.
 
 ## Quickstart
 
-Create an environment and install the package:
+Python 3.11 or 3.12 is recommended:
 
 ```bash
+git clone https://github.com/AkshajKashyap/causal-uplift-experimentation-ops.git
+cd causal-uplift-experimentation-ops
 python -m venv .venv
 source .venv/bin/activate
 make install
-```
-
-Generate the deterministic experiment data and run the portfolio workflow:
-
-```bash
-make generate-data
 make smoke
 ```
 
-Start the staging API after the policy artifact exists:
+`make smoke` regenerates the deterministic data, core evidence, frozen artifact, API report,
+audit fixture, and observability report, then runs all tests and lint checks.
 
-```bash
-make artifact
-serve-policy-api --host 0.0.0.0 --port 8000
-```
-
-Run tests and lint independently:
-
-```bash
-make test
-make lint
-```
-
-Inspect installed package and policy metadata:
+Inspect package metadata or start the staging API:
 
 ```bash
 causal-uplift-ops --version
 causal-uplift-ops project-info
+serve-policy-api --host 0.0.0.0 --port 8000
 ```
+
+Run quality gates independently:
+
+```bash
+make check
+```
+
+## Current promotion decision
+
+- Decision: **hold**
+- Frozen candidate: logistic S-learner / all-positive-uplift policy, artifact `1.0.0`
+- Technical snapshot: input drift passes, audit health passes, prediction drift warns
+- Warning: the reference scoring batch has 100% positive scores and a 100% recommendation rate
+- Blocking evidence gap: all model, policy, and trial evidence is synthetic
+- Required next step: run the pre-registered real prospective randomized holdout trial
+
+## What this project is / is not
+
+This **is** a synthetic causal ML experimentation and policy-operations system. It demonstrates
+uplift modeling, randomized experiment analysis, policy simulation, artifact freezing, staging
+serving, safety controls, and offline observability.
+
+This **is not** proof of real-world treatment effectiveness, a production deployment, or a
+substitute for real eligibility, delivery, outcome, fairness, and harm data. The promotion gate
+correctly holds the artifact pending prospective randomized validation.
+
+Key limitations:
+
+- Synthetic data cannot establish external validity or real user impact.
+- The all-positive policy is driven by the configured unconstrained economics, not universally
+  superior targeting.
+- The API and monitoring stack are local/staging implementations without durable central state.
+- Economic conclusions depend on conversion value, treatment cost, budget, and capacity.
+- Dependency versions are not lockfile-pinned for byte-identical cross-platform builds.
 
 ## Portfolio demo path
 
-`make smoke` is the one-command reviewer path. It regenerates the main data, A/B and cross-fitted
-evidence, frozen artifact, API report, deterministic audit log, observability report, tests, and
-lint checks.
+The one-command reviewer path is:
+
+```bash
+make smoke
+```
 
 After it finishes, start with:
 
@@ -55,20 +105,8 @@ After it finishes, start with:
 - `reports/staging_observability_report.md`
 
 For the system design and interview narrative, see `docs/architecture.md`,
-`docs/reproducibility.md`, and `docs/portfolio_review.md`.
-
-## Current promotion status
-
-- A versioned staging artifact exists.
-- The current promotion decision is **hold**.
-- Evidence is synthetic-only, and the all-positive policy produces a 100% recommendation-rate
-  warning.
-- The next real step is the pre-registered prospective randomized validation—not production
-  rollout.
-
-## Goal
-
-Estimate which users benefit from an intervention, not just which users are likely to convert.
+`docs/reproducibility.md`, `docs/portfolio_review.md`, and the release material under
+`reports/portfolio/`.
 
 ## Milestone 1: synthetic experiment foundation
 
@@ -539,8 +577,8 @@ score-policy-batch \
   --output artifacts/policy_bundle/batch_scores.csv
 ```
 
-Use `--include-synthetic-debug` only for explicit synthetic diagnostics; production-style output
-excludes `true_uplift`.
+Use `--include-synthetic-debug` only for explicit synthetic diagnostics; the default serving
+output excludes `true_uplift`.
 
 Run the full test and lint suite:
 

@@ -1,12 +1,30 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "causal-uplift-experimentation-ops"
 version = "0.1.0"
-description = "Causal ML experimentation platform for uplift modeling and treatment policy simulation."
+description = "Reproducible synthetic causal ML workflow for uplift evaluation and policy operations."
+readme = "README.md"
+license = "MIT"
+authors = [
+    {name = "Akshaj Kashyap"},
+]
 requires-python = ">=3.11"
+keywords = [
+    "causal-inference",
+    "uplift-modeling",
+    "ab-testing",
+    "machine-learning",
+    "experimentation",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
 dependencies = [
     "numpy",
     "pandas",
@@ -26,6 +44,11 @@ dev = [
     "pytest",
     "ruff",
 ]
+
+[project.urls]
+Homepage = "https://github.com/AkshajKashyap/causal-uplift-experimentation-ops"
+Repository = "https://github.com/AkshajKashyap/causal-uplift-experimentation-ops"
+Issues = "https://github.com/AkshajKashyap/causal-uplift-experimentation-ops/issues"
 
 [project.scripts]
 causal-uplift-ops = "causal_uplift_experimentation_ops.cli:main"
@@ -48,6 +71,9 @@ generate-api-staging-report = "causal_uplift_experimentation_ops.api.report:main
 generate-api-safety-report = "causal_uplift_experimentation_ops.api.safety_report:main"
 generate-api-audit-smoke-log = "causal_uplift_experimentation_ops.monitoring.audit:main"
 generate-staging-observability = "causal_uplift_experimentation_ops.monitoring.report:main"
+
+[tool.setuptools]
+license-files = ["LICENSE"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

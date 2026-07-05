@@ -5,7 +5,7 @@
 - Artifact directory: `artifacts/policy_bundle`
 - Artifact version: **1.0.0**
 - Package version: **0.1.0**
-- Created: 2026-07-05T01:33:17+00:00
+- Created: 2026-07-05T02:05:36+00:00
 - Data rows: 10,000
 - Data columns: 10
 - Dataset fingerprint: `543bdc505f595f138f9e4fe487723f4958cf0ec888c3d9321435c1ce52ad0a57`
@@ -20,8 +20,8 @@
 | `artifacts/policy_bundle/README.md` | `ec7e4fe43a16f742d830f45e75838728be82936e538a9c0aae2fb1e8cbd3c284` |
 | `artifacts/policy_bundle/batch_scores.csv` | `666b4b80c5a0740863b8a4fd4547a7c3ba1bae8b4b1baee79e532c30877ecd24` |
 | `artifacts/policy_bundle/feature_columns.json` | `ebabb1580e95194f227dbe6bda695efe71ea297abeaa6dd07cbc4f9f96d4475b` |
-| `artifacts/policy_bundle/model.joblib` | `59122d2d62fe5f8080ab21d0553ae38dcbb23782576d3e3e1efca39cf076caae` |
-| `artifacts/policy_bundle/policy_config.json` | `e3a729ff3b36d4107733eaa26126269e9141cc5ac33d0696cdcf94075a6d2c4d` |
+| `artifacts/policy_bundle/model.joblib` | `4d46eb7ae1e2fbfa0b480ff4deeecb1c266280dfbd82dfed85b546c3bbdc78da` |
+| `artifacts/policy_bundle/policy_config.json` | `071920f854387245886fd36ecdb8ce9387e5bed2e6e9c077843090eb7a357c57` |
 | `artifacts/policy_bundle/value_assumptions.json` | `ce435285516bbc89fe1e774a4edd07c99e3822fd9436b4f6b1011738e2d7977b` |
 
 `manifest.json` is intentionally excluded from its own file-hash map.

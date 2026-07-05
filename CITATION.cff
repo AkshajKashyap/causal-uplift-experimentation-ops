@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+type: software
+title: "Causal Uplift Experimentation Ops"
+abstract: >-
+  A reproducible synthetic causal machine-learning workflow for randomized
+  experiment analysis, uplift evaluation, treatment-policy simulation,
+  artifact freezing, staging inference, and offline promotion controls.
+authors:
+  - given-names: Akshaj
+    family-names: Kashyap
+version: 0.1.0
+date-released: 2026-07-04
+license: MIT
+repository-code: "https://github.com/AkshajKashyap/causal-uplift-experimentation-ops"
