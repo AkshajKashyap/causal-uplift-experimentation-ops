@@ -1,0 +1,38 @@
+version: 1
+
+classification:
+  source:
+    - src/**/*.py
+  tests:
+    - tests/**/*.py
+    - "**/test_*.py"
+  docs:
+    - docs/**
+    - README.md
+  dependencies:
+    - pyproject.toml
+    - requirements*.txt
+  configuration:
+    - .github/**
+    - Dockerfile*
+    - "*.yaml"
+    - "*.yml"
+
+checks:
+  tests_required_for_source_changes: true
+  forbid_paths: []
+  protect_paths:
+    - src/**/api/**
+  max_changed_files_warning: 25
+
+  requirements:
+    - id: api-change-requires-test
+      when:
+        paths:
+          - src/**/api/**
+      require_any:
+        - tests/**/*api*.py
+      severity: error
+      score: 5
+      message: API changes require a targeted API test.
+      recommendation: Add or update an API test covering the changed behavior.
